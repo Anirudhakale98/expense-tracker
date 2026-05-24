@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist), system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --nav-height: 4.25rem;
+  --page-padding-x: 1rem;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+}
+
+input,
+button,
+select,
+textarea {
+  font: inherit;
+}
+
+/* Mobile-friendly page wrapper with safe areas (notch / home indicator) */
+.page-shell {
+  min-height: 100dvh;
+  padding-left: max(var(--page-padding-x), env(safe-area-inset-left));
+  padding-right: max(var(--page-padding-x), env(safe-area-inset-right));
+  padding-top: max(1.25rem, env(safe-area-inset-top));
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 1rem);
+}
+
+/* Minimum touch target (Apple HIG ~44px) */
+.touch-target {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+
+/* Prevent iOS zoom on input focus — use 16px+ font on inputs */
+@media (max-width: 640px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
