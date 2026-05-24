@@ -54,13 +54,34 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Deploy to Vercel (≈5 minutes)
 
-1. Push this folder to GitHub
-2. Import the repo at [vercel.com](https://vercel.com)
-3. Add environment variables:
+1. Push to GitHub (see below)
+2. Import the repo at [vercel.com/new](https://vercel.com/new) → connect [anirudhakale98](https://github.com/anirudhakale98)
+3. Add environment variables in Vercel project settings:
    - `MONGODB_URI` (required)
    - `DEFAULT_SALARY` (optional)
-   - `API_SECRET` + `NEXT_PUBLIC_API_SECRET` (optional, same value — protects API)
+   - `API_SECRET` + `NEXT_PUBLIC_API_SECRET` (optional, same value)
 4. Deploy
+
+### Push to GitHub
+
+```bash
+cd expense-tracker
+gh auth login
+gh repo create expense-tracker --public --source=. --remote=origin --push
+```
+
+Or create [expense-tracker](https://github.com/new) on GitHub, then:
+
+```bash
+git remote add origin https://github.com/anirudhakale98/expense-tracker.git
+git push -u origin main
+```
+
+## Mobile
+
+- Responsive layout with safe-area support (notch / home bar)
+- Bottom navigation with 44px touch targets
+- Add to Home Screen via browser menu (PWA manifest included)
 
 ## Google Calendar
 
