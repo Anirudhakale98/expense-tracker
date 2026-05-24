@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 interface PeriodData {
+  user: { name: string; email: string };
   period: { label: string; start: string; end: string; creditDate: string };
   settings: { monthlySalary: number; currency: string };
   totals: Record<CategoryType, number> & { all: number };
@@ -53,7 +54,11 @@ export default function HomePage() {
   return (
     <PageShell
       title="Expense Tracker"
-      subtitle={data?.period.label}
+      subtitle={
+        data
+          ? `Hi ${data.user.name.split(" ")[0]} · ${data.period.label}`
+          : undefined
+      }
       action={
         <Link
           href="/add"

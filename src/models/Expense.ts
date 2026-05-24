@@ -1,7 +1,8 @@
-import mongoose, { Schema, models, model } from "mongoose";
+import mongoose, { Schema, Types, models, model } from "mongoose";
 import type { CategoryType, FoodSubType, Sector } from "@/lib/categories";
 
 export interface IExpense {
+  userId: Types.ObjectId;
   amount: number;
   category: CategoryType;
   sector: Sector;
@@ -17,6 +18,12 @@ export interface IExpense {
 
 const ExpenseSchema = new Schema<IExpense>(
   {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
     amount: { type: Number, required: true, min: 0 },
     category: {
       type: String,
@@ -37,8 +44,8 @@ const ExpenseSchema = new Schema<IExpense>(
   { timestamps: true }
 );
 
-ExpenseSchema.index({ periodStart: 1, periodEnd: 1 });
-ExpenseSchema.index({ date: -1 });
+ExpenseSchema.index({ userId: 1, periodStart: 1, periodEnd: 1 });
+ExpenseSchema.index({ userId: 1, date: -1 });
 
 export const Expense =
   models.Expense ?? model<IExpense>("Expense", ExpenseSchema);

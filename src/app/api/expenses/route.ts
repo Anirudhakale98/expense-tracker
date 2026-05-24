@@ -1,10 +1,10 @@
-import { connectDB } from "@/lib/mongodb";
-import { checkApiAuth, unauthorized } from "@/lib/api-auth";
+import { requireUser, unauthorized } from "@/lib/api-auth";
 import {
   getFoodSubType,
   type CategoryType,
   type Sector,
 } from "@/lib/categories";
+import { connectDB } from "@/lib/mongodb";
 import { getPeriodForDate, isDateInPeriod } from "@/lib/salary-period";
 import { Expense } from "@/models/Expense";
 import { getOrCreateSettings } from "@/models/Settings";
@@ -13,16 +13,18 @@ import { NextRequest } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  if (!checkApiAuth(req)) return unauthorized();
+  const user = await requireUser(req);
+  if (!user) return unauthorized();
   try {
     await connectDB();
     const start = req.nextUrl.searchParams.get("start");
     const end = req.nextUrl.searchParams.get("end");
 
-    const filter =
-      start && end
-        ? { periodStart: new Date(start), periodEnd: new Date(end) }
-        : {};
+    const filter: Record<string, unknown> = { userId: user.userId };
+    if (start && end) {
+      filter.periodStart = new Date(start);
+      filter.periodEnd = new Date(end);
+    }
 
     const expenses = await Expense.find(filter).sort({ date: -1 }).limit(500);
     return Response.json(expenses);
@@ -33,10 +35,11 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!checkApiAuth(req)) return unauthorized();
+  const user = await requireUser(req);
+  if (!user) return unauthorized();
   try {
     await connectDB();
-    const settings = await getOrCreateSettings();
+    const settings = await getOrCreateSettings(user.userId);
     const body = await req.json();
 
     const amount = Number(body.amount);
@@ -73,6 +76,7 @@ export async function POST(req: NextRequest) {
     }
 
     const expense = await Expense.create({
+      userId: user.userId,
       amount,
       category,
       sector,

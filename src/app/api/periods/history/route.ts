@@ -1,6 +1,6 @@
-import { connectDB } from "@/lib/mongodb";
-import { checkApiAuth, unauthorized } from "@/lib/api-auth";
+import { requireUser, unauthorized } from "@/lib/api-auth";
 import type { CategoryType } from "@/lib/categories";
+import { connectDB } from "@/lib/mongodb";
 import { listRecentPeriods } from "@/lib/salary-period";
 import { Expense } from "@/models/Expense";
 import { getOrCreateSettings } from "@/models/Settings";
@@ -9,10 +9,11 @@ import { NextRequest } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  if (!checkApiAuth(req)) return unauthorized();
+  const user = await requireUser(req);
+  if (!user) return unauthorized();
   try {
     await connectDB();
-    const settings = await getOrCreateSettings();
+    const settings = await getOrCreateSettings(user.userId);
     const count = Number(req.nextUrl.searchParams.get("count") ?? 12);
 
     const periods = listRecentPeriods(
@@ -24,6 +25,7 @@ export async function GET(req: NextRequest) {
     const history = await Promise.all(
       periods.map(async (p) => {
         const expenses = await Expense.find({
+          userId: user.userId,
           periodStart: p.start,
           periodEnd: p.end,
         });

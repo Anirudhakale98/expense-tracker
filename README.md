@@ -9,6 +9,7 @@ A simple web app to track monthly expenses aligned with your **salary cycle** (c
 - **Sector breakdown** — food, entertainment, transport, utilities, and more
 - **Food split** — Need + Food = mess/daily groceries; Wants + Food = outings, dates, cafes
 - **History** — browse past salary cycles with totals
+- **Per-user accounts** — sign up / sign in; each user sees only their own data
 - **MongoDB** — persistent storage (history, settings)
 - **PWA-ready** — add to home screen on mobile
 
@@ -31,10 +32,8 @@ Edit `.env.local`:
 
 ```env
 MONGODB_URI=mongodb+srv://USER:PASS@cluster.mongodb.net/expense-tracker
+AUTH_SECRET=generate-a-long-random-string
 DEFAULT_SALARY=50000
-# Optional API protection:
-# API_SECRET=your-random-secret
-# NEXT_PUBLIC_API_SECRET=your-random-secret
 ```
 
 ### 3. Install and run
@@ -48,9 +47,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### 4. First-time setup in app
 
-1. Open **Settings** → set salary day (default **26**) and monthly salary
-2. Add any extra bank holidays if your employer credits early
-3. Start logging expenses under **Add**
+1. Open the app → **Create account** (or sign in)
+2. Open **Settings** → set salary day (default **26**) and monthly salary
+3. Add any extra bank holidays if your employer credits early
+4. Start logging expenses under **Add**
 
 ## Deploy to Vercel (≈5 minutes)
 
@@ -58,8 +58,8 @@ Open [http://localhost:3000](http://localhost:3000).
 2. Import the repo at [vercel.com/new](https://vercel.com/new) → connect [anirudhakale98](https://github.com/anirudhakale98)
 3. Add environment variables in Vercel project settings:
    - `MONGODB_URI` (required)
+   - `AUTH_SECRET` (required — same as local)
    - `DEFAULT_SALARY` (optional)
-   - `API_SECRET` + `NEXT_PUBLIC_API_SECRET` (optional, same value)
 4. Deploy
 
 ### Push to GitHub

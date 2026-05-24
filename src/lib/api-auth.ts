@@ -1,12 +1,13 @@
+import { getSessionFromRequest, type SessionUser } from "@/lib/auth";
 import { NextRequest } from "next/server";
 
-export function checkApiAuth(req: NextRequest): boolean {
-  const secret = process.env.API_SECRET;
-  if (!secret) return true;
-  const header = req.headers.get("x-api-secret");
-  return header === secret;
+export function unauthorized(message = "Please sign in") {
+  return Response.json({ error: message }, { status: 401 });
 }
 
-export function unauthorized() {
-  return Response.json({ error: "Unauthorized" }, { status: 401 });
+/** Returns the logged-in user or null. */
+export async function requireUser(
+  req: NextRequest
+): Promise<SessionUser | null> {
+  return getSessionFromRequest(req);
 }

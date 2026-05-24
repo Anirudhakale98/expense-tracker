@@ -1,6 +1,6 @@
-import { connectDB } from "@/lib/mongodb";
-import { checkApiAuth, unauthorized } from "@/lib/api-auth";
+import { requireUser, unauthorized } from "@/lib/api-auth";
 import type { CategoryType } from "@/lib/categories";
+import { connectDB } from "@/lib/mongodb";
 import { getPeriodForDate } from "@/lib/salary-period";
 import { Expense } from "@/models/Expense";
 import { getOrCreateSettings } from "@/models/Settings";
@@ -9,10 +9,11 @@ import { NextRequest } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  if (!checkApiAuth(req)) return unauthorized();
+  const user = await requireUser(req);
+  if (!user) return unauthorized();
   try {
     await connectDB();
-    const settings = await getOrCreateSettings();
+    const settings = await getOrCreateSettings(user.userId);
     const period = getPeriodForDate(
       new Date(),
       settings.salaryDay,
@@ -20,6 +21,7 @@ export async function GET(req: NextRequest) {
     );
 
     const expenses = await Expense.find({
+      userId: user.userId,
       periodStart: period.start,
       periodEnd: period.end,
     }).sort({ date: -1 });
@@ -35,6 +37,7 @@ export async function GET(req: NextRequest) {
     }
 
     return Response.json({
+      user: { name: user.name, email: user.email },
       period: {
         start: period.start.toISOString(),
         end: period.end.toISOString(),

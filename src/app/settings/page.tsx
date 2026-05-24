@@ -3,6 +3,7 @@
 import { PageShell } from "@/components/PageShell";
 import { apiFetch } from "@/lib/client-fetch";
 import { formatMoney } from "@/lib/format";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Settings {
@@ -13,6 +14,10 @@ interface Settings {
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<{ name: string; email: string } | null>(
+    null
+  );
   const [settings, setSettings] = useState<Settings | null>(null);
   const [salaryDay, setSalaryDay] = useState(26);
   const [monthlySalary, setMonthlySalary] = useState("");
@@ -21,12 +26,22 @@ export default function SettingsPage() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    apiFetch<Settings>("/api/settings").then((s) => {
+    Promise.all([
+      apiFetch<{ user: { name: string; email: string } }>("/api/auth/me"),
+      apiFetch<Settings>("/api/settings"),
+    ]).then(([me, s]) => {
+      setUser(me.user);
       setSettings(s);
       setSalaryDay(s.salaryDay);
       setMonthlySalary(s.monthlySalary ? String(s.monthlySalary) : "");
     });
   }, []);
+
+  async function logout() {
+    await apiFetch("/api/auth/logout", { method: "POST" });
+    router.replace("/login");
+    router.refresh();
+  }
 
   async function save() {
     setSaving(true);
@@ -73,6 +88,20 @@ export default function SettingsPage() {
 
   return (
     <PageShell title="Settings">
+      {user && (
+        <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+          <p className="font-medium">{user.name}</p>
+          <p className="text-sm text-zinc-500">{user.email}</p>
+          <button
+            type="button"
+            onClick={logout}
+            className="mt-3 text-sm font-medium text-red-600"
+          >
+            Sign out
+          </button>
+        </div>
+      )}
+
       <div className="space-y-5">
         <div>
           <label className="mb-1 block text-sm font-medium text-zinc-600">

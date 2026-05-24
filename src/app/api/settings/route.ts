@@ -1,15 +1,16 @@
+import { requireUser, unauthorized } from "@/lib/api-auth";
 import { connectDB } from "@/lib/mongodb";
-import { checkApiAuth, unauthorized } from "@/lib/api-auth";
 import { getOrCreateSettings } from "@/models/Settings";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  if (!checkApiAuth(req)) return unauthorized();
+  const user = await requireUser(req);
+  if (!user) return unauthorized();
   try {
     await connectDB();
-    const settings = await getOrCreateSettings();
+    const settings = await getOrCreateSettings(user.userId);
     return Response.json(settings);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Failed to load settings";
@@ -18,10 +19,11 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  if (!checkApiAuth(req)) return unauthorized();
+  const user = await requireUser(req);
+  if (!user) return unauthorized();
   try {
     await connectDB();
-    const settings = await getOrCreateSettings();
+    const settings = await getOrCreateSettings(user.userId);
     const body = await req.json();
 
     if (body.salaryDay !== undefined) settings.salaryDay = body.salaryDay;
