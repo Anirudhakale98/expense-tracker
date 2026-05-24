@@ -100,7 +100,6 @@ export function AuthForm({ mode }: { mode: Mode }) {
           <input
             type="password"
             required
-            minLength={6}
             autoComplete={isRegister ? "new-password" : "current-password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}

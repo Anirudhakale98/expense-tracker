@@ -22,13 +22,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (password.length < 6) {
-      return Response.json(
-        { error: "Password must be at least 6 characters" },
-        { status: 400 }
-      );
-    }
-
     const normalizedEmail = email.trim().toLowerCase();
     const existing = await User.findOne({ email: normalizedEmail });
     if (existing) {
