@@ -17,11 +17,16 @@
 html {
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
   overflow-x: hidden;
-  overscroll-behavior-y: none;
+  overflow-y: auto;
+  min-height: 100dvh;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 input,
